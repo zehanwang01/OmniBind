@@ -324,9 +324,9 @@ def pc_norm(self, pc):
     return pc
 
 class Uni3D(nn.modules):
-    def __init__(self, mode= 'lvis'):
+    def __init__(self, E14p, mode= 'lvis'):
         super(Uni3D, self).__init__()
-        self.clip = EVA_CLIP_E14p()
+        self.clip = E14p
         
         self.args = torch.load('')
         self.point_encoder = getattr(uni3d_models, self.args.model)(args=self.args).cpu()
@@ -400,3 +400,78 @@ class Uni3D(nn.modules):
     
     def get_device(self):
         return next(self.point_encoder.parameters()).device
+
+def ins_expert(key, E14p=None):
+    if key == 'IB':
+        return ImageBind()
+    if key == 'CLAP_G':
+        return CLAP('G')
+    if key == 'CLAP_M':
+        return CLAP('M')
+    if key == 'WAVCAPS_PT':
+        return WavCaps('PT')
+    if key == 'WAVCAPS_FT_aud':
+        return WavCaps('FT_aud')
+    if key == 'WAVCAPS_FT_clo':
+        return WavCaps('FT_clo')
+    if key == 'DFN5B':
+        return DFN5B()
+    if key == 'EVA_E14p':
+        return EVA_CLIP_E14p()
+    if key == 'EVA_18B':
+        return EVA_18B()
+    if key == 'SigLip_384':
+        return SigLip384('SIGLIP_384')
+    if key == 'SigLip_400M_384':
+        return SigLip384('SIGLIP_400M')
+    if key == 'UNI3D_L':
+        return Uni3D(E14p, 'lvis')
+    if key == 'UNI3D_M':
+        return Uni3D(E14p, 'mnet')
+    if key == 'UNI3D_S':
+        return Uni3D(E14p, 'scan')
+
+def get_experts(keys):
+    experts = {}
+    for k in keys:
+        if 'UNI3D' in k:
+            experts[k] = ins_expert(k, E14p=experts['EVA_E14p'])
+        else:
+            experts[k] = ins_expert(k)
+    return nn.ModuleDict(experts)
+
+class Expert_Pool(nn.modules):
+    def __init__(self, config):
+        super(nn.modules, self).__init__()
+
+        self.config = config
+        self.experts = get_experts(config['all'])
+        # self.expert_keys = config['all']
+        # self.A_experts = config['A']
+        # self.V_experts = config['V']
+        # self.T_experts = config['T']
+        # self.P_experts = config['P']
+    @torch.no_grad()
+    def emb_audios(self, audio_files:[str]):
+        audio_embs = []
+        for k in self.config['A']:
+            audio_embs.append(self.experts[k].emb_audios(audio_files))
+        return audio_embs
+    @torch.no_grad()
+    def emb_images(self, image_files:[str]):
+        image_embs = []
+        for k in self.config['V']:
+            image_embs.append(self.experts[k].emb_images(image_files))
+        return image_embs
+    @torch.no_grad()
+    def emb_points(self, point_files:[str]):
+        point_embs = []
+        for k in self.config['P']:
+            point_embs.append(self.experts[k].emb_points(point_files))
+        return point_embs
+    @torch.no_grad()
+    def emb_texts(self, texts:[str]):
+        text_embs = []
+        for k in self.config['T']:
+            text_embs.append(self.experts[k].emb_texts(texts))
+        return text_embs
