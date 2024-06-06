@@ -6,6 +6,6 @@ apt install libgeos++-dev
 git clone https://github.com/facebookresearch/ImageBind.git
 cd ImageBind
 pip install .
-# install omnibind envs
+# install omnibind envs, overwrite imagebind envs
 cd ..
 pip install -r requirements.txt

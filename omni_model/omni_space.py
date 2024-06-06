@@ -15,6 +15,7 @@ class OmniBind_Space(torch.nn.Module):
         super(OmniBind_Space, self).__init__()
         self.expert_pool = None
         self.atvp_router = None
+        check_download()
         
     @torch.no_grad()
     def emb_audios(self, audio_files:[str])->Tensor:

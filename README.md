@@ -32,30 +32,52 @@
 ## Usage
 
 ### 1. preparing enviornments
+Clone this repository and navigate to OmniBind folder.
+```shell
+git clone https://github.com/zehanwang01/OmniBind
+cd OmniBind
+```
 Install pytorch and other 3rd party dependencies.
-Note that SigLip and laion-clap has environment conflict on transformers. We choose the 4.37.2 transformer version for siglip and built parts of 4.30.2 into the repository for CLAP.
-To install ImageBind in this environment, you should clone the [ImageBind repository](https://github.com/facebookresearch/ImageBind), then follow the guide in the repo.
-Make sure `libgeos++-dev` is installed in your environment(`sudo apt install libgeos++-dev`), otherwise the you may fail to `pip install cartorpy` for imagebind.
+
 See `preparation.sh` for more details, or just execute the file.
 ```shell
 chmod +x preparation.sh
 bash ./preparation.sh
 ```
 
-### 2. download checkpoints
+>Lips: SigLip and laion-clap has environment conflict on transformers. We choose the 4.37.2 transformer version for siglip and built parts of 4.30.2 into the repository for CLAP.
+To install ImageBind in this environment, make sure `libgeos++-dev` is installed in your environment(`sudo apt install libgeos++-dev`), otherwise the you may fail to install package `cartorpy` for imagebind.
+
+### 2. Inference
+
+Extract and compare embeddings in OmniBind:
+>Note: The weights of some expert models and routers will be downloaded when the OmniBind is loaded for the first time.
+```python
+from omni_model.omni_space import *
+from safetensors.torch import load_model
+a = OmniBind_Large(pretrained=True)
+load_model(a, 'checkpoints/large.safetensors')
+a = a.cuda()
+with torch.no_grad():
+    aud = a.emb_audios(['assets/train.wav', 'assets/toilet.wav'])
+    img = a.emb_images(['assets/train.jpeg', 'assets/toilet.jpeg'])
+    txt = a.emb_texts(['a photo of train', 'a photo of toilet'])
+    pc = a.emb_texts(['assets/train.npy', 'assets/toilet.npy'])
+print(aud.shape, img.shape, txt.shape, pc.shape)
+print(aud@img.T)
+print(aud@txt.T)
+print(aud@pc.T)
+print(img@txt.T)
+print(img@pc.T)
+print(txt@pc.T)
+
+```
+
+### 3. Pretrained weights
+
 We have made minor changes to the code of `CLAP`, `Wavcaps` and `Uni3D` to make them better initialized in `OmniBind`, and the relevant code is included in the `omni_model` directory.
 
 The encoder and projectors of OmniBind have been included in the checkpoint we prepared([Huggingface OmniBind](https://huggingface.co/Viglong/OmniBind)).
-
-You can execute the following script to set `checkpoints`.
-
-```shell
-git lfs clone https://huggingface.co/Viglong/OmniBind
-mv OmniBind/checkpoints ./checkpoints
-rm -r OmniBind
-```
-
-Next, check that the path in file `omni_model/paths.py` is correct.
 
 The final structure of `checkpoints` should be like this:
 ```
@@ -77,30 +99,4 @@ The final structure of `checkpoints` should be like this:
         HTSAT-BERT-FT-Clotho.pt
     EVA02_CLIP_E_psz14_plus_s9B.pt                      [pretrained weights for EVA_CLIP_E14p]
     
-```
-
-### 3. Inference
-
-Extract and compare embeddings in OmniBind:
-
-
-```python
-from omni_model.omni_space import *
-from safetensors.torch import load_model
-a = OmniBind_Large(pretrained=True)
-load_model(a, 'checkpoints/large.safetensors')
-a = a.cuda()
-with torch.no_grad():
-    aud = a.emb_audios(['assets/train.wav', 'assets/toilet.wav'])
-    img = a.emb_images(['assets/train.jpeg', 'assets/toilet.jpeg'])
-    txt = a.emb_texts(['a photo of train', 'a photo of toilet'])
-    pc = a.emb_texts(['assets/train.npy', 'assets/toilet.npy'])
-print(aud.shape, img.shape, txt.shape, pc.shape)
-print(aud@img.T)
-print(aud@txt.T)
-print(aud@pc.T)
-print(img@txt.T)
-print(img@pc.T)
-print(txt@pc.T)
-
 ```

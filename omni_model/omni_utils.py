@@ -12,6 +12,8 @@ import math
 import torch
 import glob
 import os
+from paths import *
+from huggingface_hub import hf_hub_download, snapshot_download
 
 def seg_mean(x, split_size_or_sections=7, dim=1):
     x = torch.split(x, split_size_or_sections=split_size_or_sections, dim=dim)
@@ -114,3 +116,10 @@ def get_config(mode):
         config['in_dim'] = {'AT':[1024, 1024, 1024], 'VT': [1024], 'PVT': [1024]}
     
     return config
+
+
+def check_download():
+    if not os.path.exists('./checkpoints'):
+        snapshot_download(repo_id="Viglong/OmniBind", local_dir=".")
+    else:
+        print('checkpoints dir already exists')
