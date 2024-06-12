@@ -212,6 +212,11 @@ class CLAP_Module(torch.nn.Module):
             text_input = tokenizer(x)
         else:
             text_input = self.tokenizer(x)
+        
+        if len(text_input['input_ids'].shape) == 1:
+            text_input['input_ids']      = text_input['input_ids'].unsqueeze(0)
+            text_input['attention_mask'] = text_input['attention_mask'].unsqueeze(0)
+            
         text_embed = self.model.get_text_embedding(text_input)
         if not use_tensor:
             text_embed = text_embed.detach().cpu().numpy()
