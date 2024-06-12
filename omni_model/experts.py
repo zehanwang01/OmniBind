@@ -139,11 +139,13 @@ class CLAP(Expert):
             self.clap = laion_clap.CLAP_Module(enable_fusion=False, amodel= 'HTSAT-base', device='cpu')
             if pretrained:
                 self.clap.load_ckpt(CLAP_M_PATH)
-        
+    
+    @torch.no_grad()
     def emb_audios(self, audio_files:[str]):
         clap_emb = F.normalize(self.clap.get_audio_embedding_from_filelist(x = audio_files, use_tensor=True))
         return clap_emb
     
+    @torch.no_grad()
     def emb_texts(self, texts:[str]):
         clap_emb = F.normalize(self.clap.get_text_embedding(x=texts, use_tensor=True))
         return clap_emb
