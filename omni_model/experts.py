@@ -338,7 +338,7 @@ class SigLip384(Expert):
 
 # check pass
 # Uni3D lvis mnet scan
-def pc_norm(self, pc):
+def pc_norm(pc):
     """ pc: NxC, return NxC """
     centroid = np.mean(pc, axis=0)
     pc = pc - centroid

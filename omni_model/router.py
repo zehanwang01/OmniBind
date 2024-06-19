@@ -6,6 +6,7 @@ import copy
 from tqdm import tqdm
 from projector import *
 from omni_utils import *
+from typing import List, Tuple
 
 class MOE_Router_Sig(torch.nn.Module):
     def __init__(self, in_dim, hidden_dim=100, out_dim=2, bias=True):
@@ -98,7 +99,7 @@ class ATVP_router_UNI(torch.nn.Module):
         self.text_pred  = config['T_pred']
         
     # audio expert + IB[-1]
-    def proj_audio(self, x:[torch.Tensor]):
+    def proj_audio(self, seq:List[torch.Tensor]):
         with torch.no_grad():
             ex_audio = [self.projs[i].proj_audio(x[i//7]) for i in range(self.A_proj_nums)] + [self.ib_projs[i].proj_audio(x[-1]) for i in range(7)]
             ex_audio = torch.stack(ex_audio, dim=1)
@@ -111,7 +112,7 @@ class ATVP_router_UNI(torch.nn.Module):
         ex_audio = F.normalize(torch.sum(ex_audio, dim=1), dim=-1)
         return ex_audio
     # image expert + IB[-2] + EVA_18B[-1]
-    def proj_image(self, x:[torch.Tensor]):
+    def proj_image(self, x:List[torch.Tensor]):
         with torch.no_grad():
             unieva_image = torch.mean(torch.stack([self.ib_projs[i].proj_image(x[-2]) for i in range(7)], dim=1), dim=1)*0.1
             unieva_image = F.normalize(unieva_image + x[-1]*0.9, dim=-1)
@@ -128,9 +129,9 @@ class ATVP_router_UNI(torch.nn.Module):
         ex_image = F.normalize(torch.sum(ex_image, dim=1), dim=-1)
         return ex_image
     # point expert
-    def proj_point(self, x:[torch.Tensor]):
+    def proj_point(self, x:List[torch.Tensor]):
         with torch.no_grad():
-            ex_point = [self.projs[i + self.A_proj_nums + self.V_proj_nums].proj_point(x[i//7]) for i in range(self.P_proj_nums)]
+            ex_point = [self.projs[i + self.A_proj_nums + self.V_proj_nums - self.P_proj_nums].proj_point(x[i//7]) for i in range(self.P_proj_nums)]
             ex_point = torch.stack(ex_point, dim=1)
             ex_point = seg_mean(ex_point, 7, dim=1)
             B = len(x[-1])
@@ -142,7 +143,7 @@ class ATVP_router_UNI(torch.nn.Module):
         ex_point = F.normalize(torch.sum(ex_point, dim=1), dim=-1)
         return ex_point
     # text expert[AT VT PVT] + IB[-2] + EVA_18B[-1]
-    def proj_text(self, x:[torch.Tensor]):
+    def proj_text(self, x:List[torch.Tensor]):
         
         with torch.no_grad():
             unieva_text = torch.mean(torch.stack([self.ib_projs[i].proj_text(x[-2]) for i in range(7)], dim=1), dim=1)*0.1
@@ -163,7 +164,7 @@ class ATVP_router_UNI(torch.nn.Module):
         ex_text = F.normalize(torch.sum(ex_text, dim=1), dim=-1)
         return ex_text
 
-    def get_text_enc_pred(self, x:[torch.Tensor]):
+    def get_text_enc_pred(self, x:List[torch.Tensor]):
         x_pred = [x[idx_p] for idx_p in self.text_pred]
         T_enc_weights = self.T_enc_router(torch.cat(x_pred, dim=1))
         return T_enc_weights
@@ -254,7 +255,7 @@ class ATVP_router_wo18B(torch.nn.Module):
         device = self.get_device()
         with torch.no_grad():
             x = [x_i.to(device) for x_i in x]
-            ex_point = [self.projs[i + self.A_proj_nums + self.V_proj_nums].proj_point(x[i//7]) for i in range(self.P_proj_nums)]
+            ex_point = [self.projs[i + self.A_proj_nums + self.V_proj_nums - self.P_proj_nums].proj_point(x[i//7]) for i in range(self.P_proj_nums)]
             ex_point = torch.stack(ex_point, dim=1)
             ex_point = seg_mean(ex_point, 7, dim=1)
             B = len(x[-1])
