@@ -1,6 +1,3 @@
-# OmniBind
-
-
 <h2 align="center"> <a href=""> OmniBind: Large-scale Omni Multimodal Representation via Binding Spaces </a> </h2>
 
 [**Zehan Wang**](https://zehanwang01.github.io/) · [**Ziang Zhang**]() · [**Hang Zhang**]() · [**Luping Liu**]() · [**Rongjie Huang**]() · [**Xize Cheng**]() · [**Hengshuang Zhao**]() · [**Zhou Zhao**]()
