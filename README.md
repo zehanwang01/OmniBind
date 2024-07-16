@@ -1,9 +1,15 @@
 # OmniBind
 
 
+<h2 align="center"> <a href=""> OmniBind: Large-scale Omni Multimodal Representation via Binding Spaces </a> </h2>
 
+[**Zehan Wang**](https://zehanwang01.github.io/) · [**Ziang Zhang**]() · [**Hang Zhang**]() · [**Luping Liu**]() · [**Rongjie Huang**]() · [**Xize Cheng**]() · [**Hengshuang Zhao**]() · [**Zhou Zhao**]()
 
+OmniBind provide large-scale **3D point-audio-image-language** omni representation models, ranging in scale **from 7B to 30B** parameters, achieve SoTA on **13 benchmarks**.
 
+## News
+- `2024/07/17`: <a href="">OmniBind</a> is released.
+- `2024/05/02`: The predecessor <a href="https://arxiv.org/abs/2405.04883">FreeBind</a> is accepted by ICML2024, and it is released at <a href="https://github.com/zehanwang01/FreeBind">Here</a>.
 
 ## File structure
 ```
@@ -100,3 +106,18 @@ The final structure of `checkpoints` should be like this:
     EVA02_CLIP_E_psz14_plus_s9B.pt                      [pretrained weights for EVA_CLIP_E14p]
     
 ```
+
+## Citation
+If you find this project useful, please consider giving a star and citation:
+
+```bibtex
+@misc{wang2024freebind,
+      title={FreeBind: Free Lunch in Unified Multimodal Space via Knowledge Fusion}, 
+      author={Zehan Wang and Ziang Zhang and Xize Cheng and Rongjie Huang and Luping Liu and Zhenhui Ye and Haifeng Huang and Yang Zhao and Tao Jin and Peng Gao and Zhou Zhao},
+      year={2024},
+      eprint={2405.04883},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
+If you have any questions or suggestions, feel free to drop us an email ( [wangzehan01@zju.edu.cn](wangzehan01@zju.edu.cn), [ziangzhang@zju.edu.cn](ziangzhang@zju.edu.cn) ) or open an issue.
