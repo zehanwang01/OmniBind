@@ -1,6 +1,7 @@
 from omni_model.omni_space import *
 a = OmniBind_Large(pretrained=True)
-# a = a.cuda()
+a = a.cuda()
+a = a.eval()
 with torch.no_grad():
     aud = a.emb_audios(['assets/train.wav', 'assets/toilet.wav'])
     img = a.emb_images(['assets/train.jpeg', 'assets/toilet.jpeg'])

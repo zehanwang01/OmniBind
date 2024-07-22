@@ -2,3 +2,4 @@
 checkpoints/*
 omni_model_backup/*
 **/__pycache__/**
+.idea/*
