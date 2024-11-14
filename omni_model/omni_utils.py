@@ -37,7 +37,7 @@ def get_config(mode):
                           'UNI3D_M',
                           'UNI3D_S']
         config['EVA_18B'] = True
-        config['A'] = AT_ckpt_modes + ['IB', 'EVA_18B']
+        config['A'] = AT_ckpt_modes + ['IB']
         config['V'] = VT_ckpt_modes + PVT_ckpt_modes + ['IB', 'EVA_18B']
         config['T'] = AT_ckpt_modes + VT_ckpt_modes + PVT_ckpt_modes + ['IB', 'EVA_18B']
         config['P'] = PVT_ckpt_modes
