@@ -43,9 +43,9 @@ def get_config(mode):
         config['P'] = PVT_ckpt_modes
         config['all'] = AT_ckpt_modes + VT_ckpt_modes + PVT_ckpt_modes + ['IB', 'EVA_18B']
         config['A_pred'] = 2
-        config['V_pred'] = 4
+        config['V_pred'] = 3
         config['P_pred'] = 0
-        config['T_pred'] = [2,9,10]
+        config['T_pred'] = [2,8,9]
         config['A_pred_dim'] = 1024
         config['V_pred_dim'] = 1152
         config['P_pred_dim'] = 1024
@@ -55,6 +55,7 @@ def get_config(mode):
         config['P_num'] = 3
         
         config['in_dim'] = {'AT':[512, 512, 1024, 1024, 1024], 'VT': [1024, 1024, 1024, 1152], 'PVT': [1024, 1024, 1024]}
+        config['out_dim'] = 1536
     if mode == 'Large':
         config = {}
         AT_ckpt_modes = ['CLAP_G',
@@ -88,6 +89,7 @@ def get_config(mode):
         config['P_num'] = 3
         
         config['in_dim'] = {'AT':[512, 512, 1024, 1024, 1024], 'VT': [1024, 1024, 1024, 1152], 'PVT': [1024, 1024, 1024]}
+        config['out_dim'] = 1536
     if mode == 'Base':
         config = {}
         AT_ckpt_modes = ['WAVCAPS_PT',
@@ -114,7 +116,7 @@ def get_config(mode):
         config['P_num'] = 1
         
         config['in_dim'] = {'AT':[1024, 1024, 1024], 'VT': [1024], 'PVT': [1024]}
-    
+        config['out_dim'] = 1536
     return config
 
 
